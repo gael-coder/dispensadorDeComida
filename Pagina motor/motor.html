@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dispensador de comida para peces</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 50px;
+            margin: 0;
+            height: 100vh;
+            background: linear-gradient(to bottom, #1e3c72, #2a5298, #3c8dbc, #5ac8f5);
+            color: white;
+        }
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #3cdb70;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Dispensador de comida para peces</h1>
+    <button id="activateButton">Activar Motor</button>
+    <div id="status" class="status"></div>
+
+    <script>
+        const activateButton = document.getElementById("activateButton");
+
+        activateButton.addEventListener("click", () => {
+            const url = "https://api.particle.io/v1/devices/e00fce68ce6885f40a76bd65/motor";
+            const accessToken = "c4f84b358e2a812da35b45eef05d801d12b634c6";
+            const params = "on";
+            fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: `access_token=${accessToken}&params=${params}`
+            })
+            .then(response => {
+                if (response.ok) {
+                } else {
+                    return response.json().then(data => {
+                        throw new Error(data.error || "Error desconocido");
+                    });
+                }
+            })
+            .catch(error => {
+                
+            });
+        });
+    </script>
+</body>
+</html>
