@@ -11,8 +11,7 @@
             padding: 50px;
             margin: 0;
             height: 100vh;
-            background: linear-gradient(to bottom, #1e3c72, #2a5298, #3c8dbc, #5ac8f5);
-            color: white;
+            color: rgb(0, 0, 0);
         }
         button {
             padding: 15px 30px;
@@ -26,47 +25,52 @@
         button:hover {
             background-color: #0056b3;
         }
-        .status {
-            margin-top: 20px;
-            font-size: 16px;
-            color: #3cdb70;
-        }
-        .error {
-            color: red;
-        }
     </style>
 </head>
 <body>
     <h1>Dispensador de comida para peces</h1>
     <button id="activateButton">Activar Motor</button>
-    <div id="status" class="status"></div>
 
     <script>
         const activateButton = document.getElementById("activateButton");
 
-        activateButton.addEventListener("click", () => {
+        activateButton.addEventListener("click", async () => {
             const url = "https://api.particle.io/v1/devices/e00fce68ce6885f40a76bd65/motor";
             const accessToken = "c4f84b358e2a812da35b45eef05d801d12b634c6";
             const params = "on";
-            fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: `access_token=${accessToken}&params=${params}`
-            })
-            .then(response => {
-                if (response.ok) {
-                } else {
-                    return response.json().then(data => {
-                        throw new Error(data.error || "Error desconocido");
-                    });
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `access_token=${accessToken}&params=${params}`
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
                 }
-            })
-            .catch(error => {
-                
-            });
+
+                const data = await response.json();
+
+                if (data.return_value === 1) {
+                    alert("El motor se activó correctamente.");
+                    console.log(data)
+
+                } else {
+                    alert("Error al activar el motor. Código de retorno inesperado.");
+                    console.log(data)
+
+                }
+            } catch (error) {
+                alert("Error al conectar con el API: " + error.message);
+                console.error("Error:", error);
+            }
         });
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
