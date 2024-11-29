@@ -1,36 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dispensador de comida para peces</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 50px;
-            margin: 0;
-            height: 100vh;
-            color: rgb(0, 0, 0);
-        }
-        button {
-            padding: 15px 30px;
-            font-size: 18px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <link rel="stylesheet" href="estilo.css">
+
 </head>
+
 <body>
     <h1>Dispensador de comida para peces</h1>
     <button id="activateButton">Activar Motor</button>
 
+    <div class="input-container">
+        <div>
+            <label for="hour">Ingresar Hora</label><br>
+            <input type="text" id="hour" placeholder="HH" maxlength="2">
+        </div>
+        <button id="registerTimeButton">Registrar Hora</button>
+
+        <div>
+            <label for="minute">Ingresar Minuto</label><br>
+            <input type="text" id="minute" placeholder="MM" maxlength="2">
+        </div>
+    </div>
+    <!-- script para el funcionamiento del motor  -->
     <script>
         const activateButton = document.getElementById("activateButton");
 
@@ -69,6 +64,72 @@
             }
         });
     </script>
+    <!-- script para que los recuadros de hora y minutos solo permita numeros correctos -->
+    <script>
+        // Validar entrada de horas (00-23)
+        document.getElementById('hour').addEventListener('input', function (e) {
+            let value = e.target.value;
+            if (!/^\d{0,2}$/.test(value) || parseInt(value) > 23) {
+                e.target.value = value.slice(0, -1); // Elimina el último carácter no válido
+            }
+        });
+
+        // Validar entrada de minutos (00-59)
+        document.getElementById('minute').addEventListener('input', function (e) {
+            let value = e.target.value;
+            if (!/^\d{0,2}$/.test(value) || parseInt(value) > 59) {
+                e.target.value = value.slice(0, -1); // Elimina el último carácter no válido
+            }
+        });
+    </script>
+    <!--script para el funcionamiento de la alarma XD  -->
+    <script>
+        const registerTimeButton = document.getElementById("registerTimeButton");
+
+        registerTimeButton.addEventListener("click", async () => {
+            const hour = document.getElementById("hour").value;
+            const minute = document.getElementById("minute").value;
+
+            if (hour === "" || minute === "" || isNaN(hour) || isNaN(minute)) {
+                alert("Por favor, ingresa valores válidos para la hora y los minutos.");
+                return;
+            }
+
+            const url = "https://api.particle.io/v1/devices/e00fce68ce6885f40a76bd65/scheduleTime";
+            const accessToken = "c4f84b358e2a812da35b45eef05d801d12b634c6";
+            const params = `${hour},${minute}`; // Envía hora y minuto separados por una coma
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded"
+                    },
+                    body: `access_token=${accessToken}&params=${params}`
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.return_value === 1) {
+                    alert("La hora y los minutos se registraron correctamente.");
+                    console.log(data);
+                } else {
+                    alert("Error al registrar la hora y los minutos. Código de retorno inesperado.");
+                    console.log(data);
+                }
+            } catch (error) {
+                alert("Error al conectar con el API: " + error.message);
+                console.error("Error:", error);
+            }
+        });
+    </script>
+</body>
+
+</html>
 </body>
 </html>
     </script>
